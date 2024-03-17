@@ -1,0 +1,23 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /home/ec2-user/concordia
+permissions:
+  - object: /home/ec2-user/concordia
+    owner: ec2-user
+    group: ec2-user
+    pattern: "**"
+    mode: 775
+    type: 
+      - file
+      - directory
+hooks:
+  AfterInstall: 
+    - location: deployment/prepare.sh
+      runas: ec-user
+  ApplicationStart:
+    - location: deployment/finish.sh
+      timeout: 60
+      runas: ec2-user
+
