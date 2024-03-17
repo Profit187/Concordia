@@ -2,8 +2,8 @@ import express from 'express';
 import { QuickDB } from "quick.db";
 
 const app = express();
-const db = new QuickDB();
-const db_status = new QuickDB();
+const db = new QuickDB(process.env.QUICK_DB_LOCATION ? {filePath: process.env.QUICK_DB_LOCATION} : {});
+const db_status = new QuickDB(process.env.QUICK_DB_LOCATION ? {filePath: process.env.QUICK_DB_LOCATION} : {});
 
 app.use(express.static('public'));
 app.use(express.json());
