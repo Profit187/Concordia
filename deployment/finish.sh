@@ -1,2 +1,4 @@
+export NVM_DIR=$HOME/.nvm;
+source $NVM_DIR/nvm.sh;
 cd ..
-/home/ec2-user/.nvm/versions/node/v20.10.0/bin/pm2 start pm2.json --env production
+pm2 start pm2.json --env production
