@@ -1,6 +1,7 @@
 import express from 'express';
 import { QuickDB } from "quick.db";
 
+console.log(process.env.QUICK_DB_LOCATION)
 const app = express();
 const db = new QuickDB(process.env.QUICK_DB_LOCATION ? {filePath: process.env.QUICK_DB_LOCATION} : {});
 const db_status = new QuickDB(process.env.QUICK_DB_LOCATION ? {filePath: process.env.QUICK_DB_LOCATION} : {});
