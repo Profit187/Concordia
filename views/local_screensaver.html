@@ -1,0 +1,332 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<meta charset=utf-8 />
+<title>Status Output</title>
+
+<style type="text/css" >
+
+body {
+	margin:0px;
+	padding:0px;
+	/*overflow: hidden;*/
+}
+
+@font-face {
+  font-family: "hultog";
+  src: url(hultog.ttf);
+}
+
+@font-face {
+  font-family: "digital-7 mono";
+  src: url(digital-7_mono.ttf);
+}
+
+.blink {
+    animation: blink 1s steps(5, start) infinite;
+}
+@keyframes blink {
+    to {
+        visibility: hidden;
+    }
+}
+
+.graphics {
+  position: absolute;
+}
+
+#background {
+  z-index: -3;
+}
+
+#overlay {
+  z-index: +2;
+}
+
+.marquee_left{
+    animation-name: marquee_left;
+    animation-timing-function: linear;
+    animation-duration:20s;
+    animation-iteration-count: infinite;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: block;
+    white-space: nowrap;
+}
+
+.marquee_right{
+    animation-name: marquee_right;
+    animation-timing-function: linear;
+    animation-duration:20s;
+    animation-iteration-count: infinite;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: block;
+    white-space: nowrap;
+}
+
+@keyframes marquee_left{
+    0%{
+        text-indent: 95%;
+}
+    100%{
+        text-indent: -80%;  
+    }
+}
+
+@keyframes marquee_right{
+    0%{
+        text-indent: -95%;
+}
+    100%{
+        text-indent: 80%;  
+    }
+}
+
+
+#marquee_top {
+  position: absolute;
+  /*border: 1px solid white;*/
+  width: 1565px;
+  top: 35px;
+  left: 180px;
+  font-family: "hultog",serif;
+  font-size: 72px;
+  font-variant: small-caps;
+  color: red; 
+}
+
+#marquee_bottom {
+  position: absolute;
+  /*border: 1px solid white;*/
+  width: 1565px;
+  top: 975px;
+  left: 180px;
+  font-family: "hultog",serif;
+  font-size: 72px;
+  font-variant: small-caps;
+  color: red;
+}
+
+#clock {
+  font-family: "digital-7 mono",serif;
+  position: absolute;
+  top: 740px;
+  left: 620px;
+  width: 680px;
+  font-size: 220px;
+  color: red;
+  /*border: 1px solid white;*/
+}
+
+
+#status_left {
+	position: absolute;
+	top: 200px;
+	left: 65px;
+	font-size: 16px;
+	color: white;
+	width: 900px;
+	height: 435px;
+	font-family: "hultog",serif;
+	/*border: 1px solid white;*/
+}
+
+#status_right {
+	position: absolute;
+	top: 200px;
+	left: 965px;
+	font-size: 35px;
+	color: white;
+	width: 900px;
+	height: 435px;
+	font-family: "hultog",serif;
+	overflow: hidden;
+	/*border: 1px solid white;*/
+}
+
+#right_content {
+	position:absolute;
+	bottom: 0px;
+	left: 0px;
+}
+
+#status_top{
+	position: absolute;
+	top: 140px;
+	left: 850px;
+	/*width: 300px;*/
+	font-size: 45px;
+	color: red;
+	font-family: "hultog",serif;
+	/*border: 1px solid white;*/
+}
+
+#status_bottom{
+	position: absolute;
+	top:640px;
+	left: 110px;
+	font-size: 25px;
+	color: white;
+	width: 1700px;
+	height: 310px;
+	font-family: "hultog",serif;
+	/*border: 1px solid white;*/
+	overflow: hidden;
+}
+#bottom_content{
+	position:absolute;
+	bottom: 0px;
+	left: 0px;
+}
+
+</style>
+</head>
+<body>
+	
+
+  <img class="graphics" id="background" src="HelmConsoleGreen_border.png">
+	<img class="graphics" id="overlay" src="FINAL_InterlacedOverlay.png">
+
+	<div class="marquee_left" id="marquee_top">An open mind is like a fortress with its gates unbarred and unguarded</div>
+  	<div class="marquee_right" id="marquee_bottom">Thought begets heresy: Heresy begets retribution</div>
+	
+	<div id="clock"></div>
+	
+	<div id="status_top"></div>
+	
+	<div id="status_left"></div>    
+				
+  	<div id="status_right"><div id="right_content"></div></div>
+		
+	</div>
+	
+	<div id="status_bottom"><div id="bottom_content"></div></div>
+	
+  
+<script>
+
+function display_clock(){
+	var now = new Date();
+	// Get the hours, minutes and seconds from the current time
+        var hours = now.getHours();
+        var minutes = now.getMinutes();
+        var seconds = now.getSeconds();
+ 
+        // Format hours, minutes and seconds
+        if (hours < 10) {
+ 	       hours = "0" + hours;
+        }
+        if (minutes < 10) {
+           minutes = "0" + minutes;
+        }
+        if (seconds < 10) {
+           seconds = "0" + seconds;
+        }
+ 
+        // Sets the elements inner HTML value to our clock data
+        document.getElementById("clock").innerHTML = `${hours}<span style='font-family:ticking timebomb bb'>:</span>${minutes}<span style='font-family:ticking timebomb bb'>:</span>${seconds}`;
+}
+
+function display_marquees(){
+	var marquee_data = ["An open mind is like a fortress with its gates unbarred and unguarded","Thought begets heresy: Heresy begets retribution","Hope is the first step on the road to disappointment","Innocence proves nothing","There is no such thing as innocence, only degrees of guilt", "Blessed is the mind too small to doubt","The Known is but a shadow of the Knowable", "Knowledge is power, hide it well", "Knowledge is power, guard it well", "A small mind is a tidy mind", "A small mind is easily filled with faith", "An empty mind is a loyal mind", "Be strong in your ignorance","Doubt is the open gate through which slips the most fatal of enemies","Ignorance is a virtue","Ignorance is no excuse","The population needs deception, so deceive them", "The difference between heresy and treachery is ignorance","That which is unknown and unseen always commands the greatest fear", "Only the awkward question; only the foolish ask twice", "Victory needs no explanation; defeat allows none", "Success is commemorated, failure merely remembered","The rewards of tolerance are treachery and betrayal","Tolerance is a sign of weakness","No battle was every won that was poorly planned. No plan ever succeeded that was poorly conceived", "Pain is an illusion of the senses, despair is an illusion of the mind.","Even a person who has nothing can still give hir life", "Doubt is the open gate through which slips the most fatal of enemies", "A good soldier obeys without question. A good officer commands without doubt","To admit defeat is to blaspheme against the Emperor","For those who seek perfection there can be no rest on this side of the grave","Innocence proves nothing","Only in death does duty end","No man died in the Emperor's service that died in vain","Beginning reform is beginning revolution","Educate men without faith and you but make them clever devils","Success is measured in blood; yours or your enemy?s","Burn the heretic. Kill the mutant. Purge the unclean","It is better to die for the Emperor than to live for yourself","Fear denies faith","Foolish are those who fear nothing, yet claim to know everything","Brave are they who know everything yet fear nothing","Happiness is a delusion of the weak","All souls call out for salvation","Life is the Emperor's currency, spend it well","A suspicious mind is a healthy mind","Cowards die in shame","Faith without deeds is worthless","True Happiness stems only from Duty","The blood of martyrs is the seed of the Imperium","Heresy grows from idleness","There is only the Emperor, and he is our shield and protector","Damnation is Eternal","Know the Mutant; Kill the Mutant","To Question is to doubt","Prayer cleanses the soul, Pain cleanses the body","Zeal is its own Excuse","Work earns Salvation","Hatred is the emperor's greatest gift to humanity","The roar of engines, the recoil of cannons. That is where the true joy of battle lies", "True justice is quite simply the will of the Emperor","To the darkness bring fire. To the ignorant bring faith"]; //quotes here
+
+	$("#marquee_top").html(marquee_data[randomizer(0,marquee_data.length)]);
+	$("#marquee_bottom").html(marquee_data[randomizer(0,marquee_data.length)]);
+}
+
+function randomizer (min, max) {	
+	return Math.floor(Math.random() * (max-min+1)) + min;
+};
+
+function printSentence(id, sentence, speed){
+  var index=0;
+  var intObject = setInterval(function() {
+    document.getElementById(id).innerHTML+=sentence[index]; 
+    index++;
+    if(index==sentence.length){
+      clearInterval(intObject);
+    }
+  }, speed);
+}
+
+function random_status(){
+	var verb = ["Analyzing","Encrypting","Decoding","Subdividing","Categorizing","Purging", "Calculating", "Preparing", "Decompressing", "Compressing", "Initiating", "Harmonizing", "Conforming", "Instigating", "Dredging", "Archiving", "Detracting", "Burning", "Sealing", "Unsealing", "Anoiting", "Cleansing"];
+	var noun_1 = ["Overlock","Streaming","Light", "Primary", "Secondary", "Code", "Heavy", "Median", "Auxiliary", "Convolution", "Complex", "Muon", "Quantum", "Plasma", "Warp Field", "Coaxial", "Transradial", "Transverse", "Tertiary", "Quarternary", "Quinternary", "Main", "Volatile", ""];
+	var noun_2 = ["Buffer","Pattern","String","Repository","Sepulcre", "Array","Cluster", "Waveform", "Malfunction", "Accelerator", "Vector", "Matrices", "Coordinates", "Generators", "Sectors", "Chamber", "Litanies", "Scriptures", "Storage", "Reserves", "Seals", "Contractors", "Subsidiaries", "Grinders", "Habitation", "Topographies"];
+	return verb[randomizer(0,verb.length-1)] + " " + noun_1[randomizer(0,noun_1.length-1)] + " " +noun_2[randomizer(0,noun_2.length-1)]
+}
+
+function random_outcome(){
+	var outcomes = ["<span style='color:green'>Success</span>", "<span style='color:green'>Success</span>", "<span style='color:green'>Success</span>", "<span style='color:green'>Success</span>", "<span style='color:green'>Success</span>", "<span style='color:red'>Fail</span>","<span style='color:green'>Complete</span>", "<span style='color:green'>Complete</span>","<span style='color:green'>Complete</span>","<span style='color:green'>Complete</span>","<span style='color:white'>Timeout</span>","<span style='color:red'>Aborted</span>"];
+	return outcomes[randomizer(0,outcomes.length-1)];
+}
+
+function random_prayer(){
+  var prayer = ["A spiritu dominatus,<br>Domine, libra nos,<br>From the lighting and the tempest,<br>Our Emperor, deliver us.<br>From plague, temptation and war,<br>Our Emperor, deliver us,<br>From the scourge of the Kraken,<br>Our Emperor, deliver us.<br>From the blasphemy of the Fallen,<br>Our Emperor, deliver us,<br>From the begetting of daemons,<br>Our Emperor, deliver us,<br>From the curse of the mutant,<br>Our Emperor, deliver us,<br>A morte perpetua,<br>Domine, libra nos.<br>That thou wouldst bring them only death,<br>That thou shouldst spare none,<br>That thou shouldst pardon none<br>We beseech the, destroy them.",
+  "Love the Emperor<br>for He is the salvation of mankind<br>Obey His words<br>for He will lead you into the light of the future<br>Heed his wisdom<br>for He will protect you from evil<br>Whisper his prayers with<br>devotion,<br>for they will save your soul<br>Honour His servants,<br>for they speak in His voice<br>Tremble before His majesty,<br>for we all walk in His immortal shadow",
+  "Our Father who waits upon the Golden Thone,<br>Hear our plea,<br>Grant us the strength to defy your foes,<br>Grant us the will to ignore their blandishments,<br>Grant us the courage to stand before them,<br>With your grace, we shall know no fear.",
+  "Emperor, your enemies are abundant.<br>Many are those who rise up against you.<br>But my faith sustains me; I shall not fear the legion,<br>Should they set themselves against you.<br><br>The Trials of Man 3:5",
+  "I shall not be left to wander the drifting roads of the Warp;<br>For there is no darkness, nor death either, in the Emperor's Light.<br>And nothing that He has wrought shall be lost.<br><br>The Trials of Man 4:7",
+  "Those who oppose thee<br>Shall know the wrath of Man.<br>Field and forest shall burn,<br>The seas shall rise and devour them,<br>The wind shall tear their nations<br>From the face of the earth,<br>Lightning shall rain down from the sky,<br>They shall cry out to their false gods,<br>And find silence.<br><br>Liturgy of War 8:2",
+  "Those who follow false Gods<br>And work to deceive others, know this:<br>There is but one Truth.<br>All things are known to our Emperor<br>And He shall judge their lies.<br><br>The Prayer of Redemption",
+  "In the absence of the Emperor, Chaos shall thrive.<br><br>Sebastian Thor 7:32",
+  "O Emperor, hear my cry:<br>Guide me through the blackest nights<br>Steel my heart against the temptations of the wicked<br>Make me to rest in your light.<br><br>My Emperor, judge me whole:<br>Find me well within Your grace<br>Touch me with fire that I be cleansed<br>Tell me I have sung to Your approval<br><br>Lord Emperor, hear my cry:<br>Seat me by Your side in death<br>Make me one within Your glory<br>And let the world once more see Your favor<br><br>For You are the fire at the heart of the world<br>And comfort is only Yours to give.<br><br>Declaration of Faith",
+  "Those who had sought to claim<br>The Imperium by violence destroyed it. What was<br>Golden and pure turned black.<br>Those who had once been Warrior-Lords,<br>The brightest of their age,<br>Were no longer men, but monsters.<br><br>The Trials of Man 1:6",
+  "And the Voice of the Emperor shook the Warp<br>Saying: In My image I have wrought My firstborn.<br>You have been given dominion over all that exists.<br>By your will all things are done.<br><br>The Emperor's Word 41:21",
+  "The Emperor is our guiding light<br>A beacon of hope for humanity in a galaxy of darkness.<br>As we serve Him,<br>He is our greatest servant.<br>As we pray to Him,<br>His thoughts are only for us.<br>And in the dark when the shadows threaten.<br>The Emperor is with us.<br>In spirit and in fact.<br><br>Libation of the Emperor",
+  "Adore the immortal Emperor<br>For He is our protector<br>Admire the immortal Emperor<br>For His Sacrifice to Mankind<br>Exalt the immortal Emperor<br>For His strict guidance<br>Rever the immortal Emperor<br>For His Undying Guard<br>Venerate the immortal Emperor<br>For His holy wisdom<br>Honour the immortal Emperor<br>For his eternal strength<br>Glorify the immortal Emperor<br>For His all-seeing vision<br>Praise the immortal Emperor<br>For His unending rule<br>Hail the immortal Emperor<br>For He is the Lord and Master<br>Worship the immortal Emperor<br>For without Him we are nothing<br>The Emperor's prayer",
+  "O immortal Emperor: Have mercy upon us, miserable unworthies that we are.<br>O Master of the Galaxy: Protect Your flock from the alien.<br>O Keeper of the Light: Guide our darkened path with your radiance.<br>We are Your warriors, and we are servants to Thee, we stand free from blindness of heart,<br> free from hypocricy, wainglory and deciet, but captive to Hatred, malice and anger, to the filth, the alien, the heretic.<br>By Thy agony and bloody sweat; by Thy golden Throne, and Thy death,<br>By Thy destruction and emergence as the God of Men,<br>Keep and strengthen us, we who fight for Thee.<br>Prayer of Adulation to the Emperor",
+  "Love the Emperor,<br>For He is the salvation of Mankind.<br>Obey His words,<br>For He will lead you into the light of the future.<br>Heed His wisdom,<br>For He will protect you from evil.<br>Whisper His prayers with devotion,<br>For they will save your Soul.<br>Honour His servants,<br>For they will speak in His voice.<br>Tremble before His majesty,<br>For we all walk in His immortal shadow.<br>Imperialer Lobgesang",
+  "Emperor of Man, overseer of all things right,<br>Whose powers none can resist, save and deliver us, we beseech,<br>From the hands of our enemies,<br>By granting us dominion over them,<br>Show us the path to victory,<br>That we might produce it in your undying name.<br>Prayer in the Time of Tumults",
+  "To be Unclean<br>That is the mark of the Mutant<br>To be Impure<br>That is the mark of the Mutant<br>To be Abhorred<br>That is the mark of the Mutant<br>To be Reviled<br>That is the mark of the Mutant<br>To be hunted<br>That is the fate of the Mutant<br>To be Purged<br>That is the fate of the Mutant<br>To be Cleansed<br>That is the fate of all Mutants<br><br>Prayer of Hatred for the Mutant, First book of indoctrinations",
+  "O Eternal Emperor,<br>Who alone watches us,<br>and rules the tides and storms,<br>be compassionate to your servants,<br>preserve us from the perils of the Warp,<br>that we may be a safeguard to the Domain of Men.<br><br>Prayer for safe return",
+  "Most powerful and glorious Emperor,<br>who commands the winds and eddies of the galaxy,<br>we miserable Men are adrift in peril,<br>we cry unto Thee for help,<br>save us, or we will perish.<br>We see how great and terrible Thou art,<br>We fear you and offer our awe,<br>We fear nought but Your Wrath,<br>and beg a chance to prove ourselves,<br>so let us not die in the tumultous waves of the Warp.<br><br>Prayer for the lost and the endangered"];
+  return prayer[randomizer(0,prayer.length-1)];
+}
+
+function display_left(){
+  document.getElementById("status_left").innerHTML = random_prayer();
+}
+
+function display_bottom(){
+	document.getElementById("bottom_content").innerHTML += random_status()+" ";
+	progress = setInterval(function(){
+		document.getElementById("bottom_content").innerHTML += ".";
+	},500)
+	setTimeout(function(){
+		document.getElementById("bottom_content").innerHTML += " " + random_outcome()+ "<br>";
+		clearInterval(progress);
+	} ,randomizer(3,18)*1000);
+}
+
+display_left();
+
+/*
+function add_random_char(id){
+	document.getElementById(id).innerHTML+=String.fromCharCode(randomizer(1,230));
+}
+*/
+
+function add_random_numbers(id){
+	document.getElementById(id).innerHTML+=randomizer(100000,999999) +" " + randomizer(0,1)+randomizer(0,1)+randomizer(0,1)+randomizer(0,1)+randomizer(0,1)+randomizer(0,1)+ " " +randomizer(100000,999999) +" " + randomizer(0,1)+randomizer(0,1)+randomizer(0,1)+randomizer(0,1)+randomizer(0,1)+randomizer(0,1) + " " +randomizer(100000,999999) +" " + randomizer(0,1)+randomizer(0,1)+randomizer(0,1)+randomizer(0,1)+randomizer(0,1)+randomizer(0,1) + "<br>";
+}
+
+update_right=setInterval(function(){add_random_numbers("right_content");},1000);
+
+update_bottom=setInterval(function(){display_bottom();},20*1000);
+
+update_left=setInterval(function(){display_left();},5*60*1000);
+update_clock=setInterval(function(){display_clock();},1000);
+update_marquee=setInterval(function(){display_marquees();},300*1000);
+
+</script>
+</body>
+</html>
+
+ 

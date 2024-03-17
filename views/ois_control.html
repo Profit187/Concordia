@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link href="/jquery.ui.css" rel="stylesheet" type="text/css" />
+  <link type="text/css" rel="stylesheet" href="/stylesheet_ois_control.css" />
+<script src="/jquery.js"></script>
+<script src="/jquery.ui.js"></script>
+   
+
+  <meta charset=utf-8 />
+  <title>OIS Control</title>
+
+</head>
+
+<body>
+  <div id ="top">
+    <button id="clear_state">Clear State</button>
+    <b>    OIS Control</b></div>
+    
+  
+  <div id="canvas_wrapper">
+      <canvas height= "5000px" width= "5000px" id="space_overlay"></canvas>
+      <canvas height= "5000px" width= "5000px" id="space"></canvas>
+    
+  </div>
+  
+  <div id="right_frame">
+    
+    <div id="zoom_and_clock">
+      <div id="clock" style="font-size:20px">Time: 00:00:00</div>
+    
+      <button id="start_clock">Start</button>
+      <button id="stop_clock">Stop</button>
+      <button id="advance_clock_30">Adv 30sek</button>
+      <button id="advance_clock_600">Adv 10min</button>
+      Background map: <select id="map_selector" onchange="select_map()"><option value="map1.jpg">Map 1</option><option value="map2.jpg">Map 2</option><option value="map3.jpg">Map 3</option><option value="map4.jpg">Map 4</option><option value="map5.jpg">Map 5</option><option value="map6.jpg">Map 6</option><option value="map7.jpg">Map 7</option><option value="map8.jpg">Map 8</option><option value="map9.jpg">Map 9</option><option value="map10.jpg">Map 10</option></select>
+
+    </div>
+
+    <div id="current_objects"><span id="mouse_coordinates">Coordinates: XXXX,YYYY   </span>New Speed or Heading: <input type="number" size="5" id="databox" value=0><p id="log"></p></div>
+     
+      <form id="inputform" name="ois">
+      #<input id="form_id" type="text" name="id" size = "1">
+      Name <input type="text" name="name" size="18">
+      
+      Class <input type="text" name="classification" size="18">
+
+      Type <input type="text" name="type" size="18">
+      <br>
+      Base Size <input type="text" name="base_size" size="1">
+      
+      Position: X <input type="text" name="position_x" size="1"> Y <input type="text" name="position_y" size="1">
+      
+      
+      Speed (lpm) <input type="text" name="current_speed" size ="1"> 
+      Target Speed <input type="text" name="target_speed" size ="1">
+      Spd delta (lpm2) <input type="text" name="max_speed_delta" size = "1">
+      
+      Heading (deg) <input type="text" name="current_heading" size = "1" value=0>
+      Target Heading <input type="text" name="target_heading" size = "1" value=0>
+      Turn rate (deg/10L) <input type="text" name="max_heading_delta" size = "1">
+      <br><br>
+      <input type="hidden" name="range_rings">
+      <input id="create_from_form" type="button" name="Create" value="Create">
+      <input id="write_from_form" type="button" name="submit" value="Write">
+      <input id="delete_object" type="button" name="Delete" value="Delete">
+            
+  
+    </form>
+  
+    <div id="database"></div>
+  </div>
+      
+</body>
+<script src='/script_ois_control.js'></script>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="/jquery.js"></script>
+<script src="/ship_setups.js"></script>
+<meta charset=utf-8 />
+<title>Status Control</title>
+
+<style>
+
+.blink {
+    animation: blink 1s steps(5, start) infinite;
+}
+@keyframes blink {
+    to {
+        visibility: hidden;
+    }
+}
+
+input {
+  width: 350px;
+  
+}
+
+.input_log {
+  width: 1000px
+}
+
+#status_right {
+  position: absolute;
+  top: 80px;  
+  left: 50%;
+}
+
+</style>
+</head>
+<body>
+  
+  <button id="start_update">Start Update</button> <select id="ship_selector"><option value="cobra">Cobra</option><option value="escort">Escort</option><option value="cruiser">Cruiser</option><option value="escort_CV">Escort CV</option><option value="carrier">Carrier</option></select> <button onclick='set_ship($("#ship_selector").val())'>Set</button><br><br>
+  
+  <div id="general_order">
+      General Order: 
+      <span id="current_general_order">(none)</span>
+      <div id="general_order_buttons">
+          <input id ="input_general_order"> 
+          <button id="set_general_order">Set</button>
+          <button id="set_secure">Secure</button>
+          <button id="set_battlestations">Battlestations</button>
+          <button id="set_silent">Silent Running</button>
+          <button id="set_brace">Brace for Impact</button>
+      </div>
+  </div> 
+  
+  <div id="status_left">
+  <b>Status Left:</b><br>    
+      
+  </div>
+  
+  <div id="status_right">
+  <b>Status Right:</b><br>    
+  </div>
+  
+  <br><br>
+  Event Log:  <button onclick="clear_event_log()">Clear log</button><br>
+  <div id="event_log_control">
+      <div id="event_log"></div>
+  </div>
+  
+<script>
+
+function system(data) {
+  this.place = data.place; //1-10
+  this.name = data.name; //e.g. "Port Macro Broadside", "Primary Auspex", "Port Shield", 
+  this.desc = data.desc; //e.g. "Range 300 VU Strength 8 Standard"
+  this.status = "No Status"; // Muzzled/Ready/Reloading/Inoperable
+  this.buttons = data.buttons; //e.g. "Muzzle, Reload, Fire"
+}
+
+function ship_status(system_setup){
+  this.general_order = false; // e.g. "brace for impact"
+  this.systems = system_setup;
+  this.event_log = ["+++"];
+}
+  
+const temp_seed = window.location.pathname.split('/');
+var current_seed = temp_seed[temp_seed.length-1];
+console.log(current_seed);
+  
+function save_status(){
+   $.post(`/status/${current_seed}`,{ship_status: JSON.stringify(current_ship_status)} );
+}
+
+var current_ship_status = [] //new ship_status(ship_systems["cobra"]);
+
+function set_ship(ship_setup){
+  console.log(ship_setup);
+  current_ship_status = new ship_status(ship_systems[ship_setup]);
+  init_systems(current_ship_status.systems);
+}
+
+$("#start_update").click(function(){
+    update=setInterval(function(){ 
+        save_status();
+        //console.log("Update started!")
+        //update_status();   
+    },1000);
+});
+
+//general order controls
+$("#set_general_order").click(function(){
+  current_ship_status.general_order = $("#input_general_order").val();
+  $("#current_general_order").html(current_ship_status.general_order);
+});
+$("#set_secure").click(function(){
+  current_ship_status.general_order = "(none)";
+  $("#current_general_order").html(current_ship_status.general_order);
+});
+$("#set_battlestations").click(function(){
+  current_ship_status.general_order = "<span class='blink' style='color:red;font-variant:all-caps;'>BATTLESTATIONS</span>";
+  $("#current_general_order").html(current_ship_status.general_order);
+});
+$("#set_silent").click(function(){
+  current_ship_status.general_order = "<span class='blink' style='color:gray;font-variant:small-caps;'>SILENT RUNNING</span>";
+  $("#current_general_order").html(current_ship_status.general_order);
+});
+$("#set_brace").click(function(){
+  current_ship_status.general_order = "<span class='blink' style='color:yellow;font-variant:small-caps;'>BRACE FOR IMPACT</span>";
+  $("#current_general_order").html(current_ship_status.general_order);
+});
+
+//init_systems (current_ship_status.systems); //fix to default
+
+function init_systems(ship_setup){
+  $("#status_left").html("<b>Status Left:</b><br>");
+  $("#status_right").html("<b>Status Right:</b><br>");
+  for (let i=0;i<ship_setup.length;i++){
+    //write system fields and buttons (each of these its own line for clarity?)
+    $(`#status_${ship_setup[i].place}`).append(`<span id='system_${i}_name' class='system_name'>${ship_setup[i].name}</span>   <span id='system_${i}_desc' class='system_desc'>${ship_setup[i].desc}</span> <button id='edit_system_${i}'>Edit</button><div id='edit_fields_system_${i}' style='display: none'><input id='system_${i}_name_input' type='text' value='${ship_setup[i].name}'> <button id='system_${i}_name_set'>Set</button> <input id='system_${i}_desc_input' type='text' value='${ship_setup[i].desc}'> <button id='system_${i}_desc_set'>Set</button></div><div id='system_${i}_status' class='system_status'>${ship_setup[i].status}</div><input id='system_${i}_status_input' type='text' value='${ship_setup[i].status}'> <button id='system_${i}_status_set'>Set</button> `);
+
+    //toggle edit button visibility
+    $(`#edit_system_${i}`).click(function(){
+      
+      if ($(`#edit_fields_system_${i}`).css("display") == "none") $(`#edit_fields_system_${i}`).css("display", "block");
+      else $(`#edit_fields_system_${i}`).css("display", "none");
+    });
+    
+    $(`#system_${i}_name_set`).click(function(){
+      current_ship_status.systems[i].name = $(`#system_${i}_name_input`).val();
+      init_systems(current_ship_status.systems);
+    });
+    $(`#system_${i}_desc_set`).click(function(){
+      current_ship_status.systems[i].desc = $(`#system_${i}_desc_input`).val();
+      init_systems(current_ship_status.systems);
+    });
+    $(`#system_${i}_status_set`).click(function(){
+      current_ship_status.systems[i].status = $(`#system_${i}_status_input`).val();
+      init_systems(current_ship_status.systems);
+    });
+    print_system_status_buttons(ship_setup[i].buttons, i)
+  }
+}
+
+function print_system_status_buttons(button_setup, system_nr) {
+  for (let i=0;i<button_setup.length;i++) {
+    $(`#status_${current_ship_status.systems[system_nr].place}`).append(`<button id='system_${system_nr}_button_${i}'>${button_setup[i].label}</button> `);
+    $(`#system_${system_nr}_button_${i}`).click(function(){
+      current_ship_status.systems[system_nr].status = button_setup[i].status;
+      init_systems(current_ship_status.systems);
+    });
+  }
+  $(`#status_${current_ship_status.systems[system_nr].place}`).append("<br>");
+}
+
+//event log controls
+
+for (var i=0;i<3;i++){        //number of log input rows here!
+    append_EL_buttons(i);
+    bind_EL_handlers(i);
+}
+
+function timestamp(){
+  var time=new Date();
+  return `[${time.getDay()}:${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}] `;
+  }
+  
+function append_EL_buttons(i){
+    $('#event_log_control').append(`<input id="input_log_${i}" class="input_log"> <button id="send_to_log_${i}">Send</button><br>`);
+}
+function bind_EL_handlers(i){
+    $(`#send_to_log_${+i}`).click(function(){
+        current_ship_status.event_log.push(`${timestamp()} +++ ${$(`#input_log_${i}`).val()} +++`); 
+    });
+}
+
+function clear_event_log() {
+  current_ship_status.event_log = ["+++"];
+}
+
+//fix this one  
+$("#load_state").click(function(){
+  load_state($("#slot").val());
+});
+
+//add "blink" template buttons?
+
+</script>
+</body>
+</html>

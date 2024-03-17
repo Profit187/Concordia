@@ -1,0 +1,128 @@
+
+/*
+* {
+  font-size: 100%;
+}
+*/
+
+#load {
+  /*whatever makes it stay in the correct place*/
+}
+
+h3 {
+  font-family: cursive;
+  margin:auto;
+  width:600px;
+ }
+
+.blink {
+  animation: blink 1s steps(5, start) infinite;
+}
+
+@keyframes blink {
+    to {
+        visibility: hidden;
+    }
+}
+
+#canvas_wrapper {
+  width: 1150px;
+  height: 800px;
+  float:left;
+  position: absolute;
+  overflow: scroll;
+  border: 1px solid black;
+  top: 35px;
+  resize: both;
+}
+
+#space_overlay {
+  
+  margin: 10px;
+  position:absolute;
+  top:0px;
+  left:0px;
+}
+
+#top {
+  
+  position:fixed;
+}
+
+#space {
+  margin: 10px;
+  background-image: url('/map1.jpg');
+  position:absolute;
+  top:0px;
+  left:0px;
+  z-index:-1;
+}
+
+#right_frame {
+  /*border: 1px dashed black;*/
+  width: 680px;
+  max-height: 100%;
+  overflow: auto;
+  top: 35px;
+  right: 0px;
+  position: absolute;
+  
+}
+
+#current_objects {
+  font-size: 18px;
+  border: 2px solid black;
+  border-radius: 10px;
+  padding: 10px;
+  /*width: 650px;*/
+  margin-bottom: 2px;
+  /*display: block;*/
+  background-color: #eee
+}
+
+#clock {
+  width: 130px;
+  display: inline;
+}
+
+#zoom_and_clock {
+  border: 2px solid black;
+  border-radius: 10px;
+  padding: 10px;
+  /*width: 650px;*/
+  background-color: #eee;
+  margin-bottom: 2px
+}
+
+#inputform {
+  border: 2px solid black;
+  border-radius: 10px;
+  padding: 10px;
+  /*width: 650px;*/
+  background-color: #eee;
+  margin-bottom: 2px
+}
+
+#database {
+  border: 2px solid black;
+  border-radius: 10px;
+  padding: 10px;
+  /*width: 650px;*/  
+}
+
+.database_object {
+  padding-top: 1px;
+  cursor: pointer;
+}
+
+.state_wrapper {
+  border: 2px solid black;
+  border-radius: 5px;
+  font-size: 14px;
+  padding: 2px;
+  margin: 1px;
+}
+
+.control_buttons {
+  font-size: 14px
+}

@@ -1,0 +1,412 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<script src="/jquery.js"></script>
+<meta charset=utf-8 />
+<title>Status Output</title>
+
+<style type="text/css" >
+
+body {
+	margin:0px;
+	padding:0px;
+	overflow: hidden;
+}
+
+@font-face {
+  font-family: "hultog";
+  src: url(/hultog.ttf);
+}
+
+@font-face {
+  font-family: "digital-7 mono";
+  src: url(/digital-7_mono.ttf);
+}
+
+.blink {
+    animation: blink 1s steps(5, start) infinite;
+}
+@keyframes blink {
+    to {
+        visibility: hidden;
+    }
+}
+
+.graphics {
+  position: absolute;
+}
+
+#background {
+  z-index: -3;
+}
+
+#overlay {
+  z-index: +2;
+}
+
+.marquee_left{
+    animation-name: marquee_left;
+    animation-timing-function: linear;
+    animation-duration:20s;
+    animation-iteration-count: infinite;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: block;
+    white-space: nowrap;
+}
+
+.marquee_right{
+    animation-name: marquee_right;
+    animation-timing-function: linear;
+    animation-duration:20s;
+    animation-iteration-count: infinite;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: block;
+    white-space: nowrap;
+}
+
+@keyframes marquee_left{
+    0%{
+        text-indent: 95%;
+}
+    100%{
+        text-indent: -80%;  
+    }
+}
+
+@keyframes marquee_right{
+    0%{
+        text-indent: -95%;
+}
+    100%{
+        text-indent: 80%;  
+    }
+}
+
+
+#marquee_top {
+  position: absolute;
+  /*border: 1px solid white;*/
+  width: 1565px;
+  top: 35px;
+  left: 180px;
+  font-family: "hultog",serif;
+  font-size: 72px;
+  font-variant: small-caps;
+  color: red; 
+}
+
+#marquee_bottom {
+  position: absolute;
+  /*border: 1px solid white;*/
+  width: 1565px;
+  top: 975px;
+  left: 180px;
+  font-family: "hultog",serif;
+  font-size: 72px;
+  font-variant: small-caps;
+  color: red;
+}
+
+#clock {
+  font-family: "digital-7 mono",serif;
+  position: absolute;
+  top: 740px;
+  left: 620px;
+  width: 680px;
+  font-size: 220px;
+  color: red;
+  /*border: 1px solid white;*/
+}
+
+
+#status_left {
+	position: absolute;
+	top: 200px;
+	left: 65px;
+	font-size: 35px;
+	color: white;
+	width: 900px;
+	height: 435px;
+	font-family: "hultog",serif;
+	/*border: 1px solid white;*/
+}
+
+#status_right {
+	position: absolute;
+	top: 200px;
+	left: 965px;
+	font-size: 35px;
+	color: white;
+	width: 900px;
+	height: 435px;
+	font-family: "hultog",serif;
+	/*border: 1px solid white;*/
+}
+
+#general_order {
+	position: absolute;
+	top: 140px;
+	left: 850px;
+	/*width: 300px;*/
+	font-size: 45px;
+	color: red;
+	font-family: "hultog",serif;
+	/*border: 1px solid white;*/
+}
+
+.desc {
+	font-size: 18px;
+}
+
+#weapons_array .name {
+	display: inline-block;
+	width: 450px;
+}
+
+#weapons_array .state {
+	color: green;
+}
+
+#shield_array .name {
+	display: inline-block;
+	width: 450px;
+}
+
+#shield_array .state {
+	color: green;
+}
+
+#auspex_array .name {
+	display: inline-block;
+	width: 450px;
+}
+
+#auspex_array .state {
+	color: green;
+}
+
+#turret_array .name {
+	display: inline-block;
+	width: 450px;
+}
+
+#turret_array .state {
+	color: green;
+}
+
+#reactor_array .name {
+	display: inline-block;
+	width: 450px;
+}
+
+#reactor_array .state {
+	color: green;
+}
+
+#valve_array .name {
+	display: inline-block;
+	width: 450px;
+}
+
+#valve_array .state {
+	color: green;
+}
+
+#event_log{
+	position: absolute;
+	top:640px;
+	left: 110px;
+	font-size: 25px;
+	color: white;
+	width: 1700px;
+	height: 310px;
+	font-family: "hultog",serif;
+	/*border: 1px solid white;*/
+	overflow: hidden;
+}
+#event_content{
+	position:absolute;
+	bottom: 0px;
+	left: 0px;
+}
+
+</style>
+</head>
+<body>
+	<img class="graphics" id="background" src="/HelmConsoleGreen_border.png">
+	<img class="graphics" id="overlay" src="/FINAL_InterlacedOverlay.png">
+
+	<div class="marquee_left" id="marquee_top">An open mind is like a fortress with its gates unbarred and unguarded</div>
+  	<div class="marquee_right" id="marquee_bottom">Thought begets heresy: Heresy begets retribution</div>
+	
+	<div id="clock"></div>
+	
+	<div id="general_order">Battlestations</div>
+	
+	<div id="status_left">    
+		
+		<div id="weapons_array"></div>
+	</div>
+  	<div id="status_right">
+		<div id="shield_array"></div>
+
+		<div id="auspex_array"></div>
+
+		<div id="turret_array"></div>
+
+		<div id="reactor_array"></div>
+
+		<div id="valve_array"></div>
+	</div>
+	
+	<div id="event_log"><div id="event_content"></div></div>
+	
+  
+<script>
+
+const temp_seed = window.location.pathname.split('/');
+var current_seed = temp_seed[temp_seed.length-1];
+console.log(current_seed);
+  
+var status = {"general_order":"Silent Running","event_log":["Test event","Fire in sector 012","Unruly crew in sector 042"],"weapons_array":[{"name":"Dorsal Macrocannon","desc":"Range 300 VU","arc":"270 degrees","state":"Ready"},{"name":"Tube One","desc":"Customised Large-Bore Ordnance Tube","arc":"front","state":"Ready"},{"name":"Tube Two","desc":"Customised Large-Bore Ordnance Tube","arc":"front","state":"Ready"},{"name":"Tube Three","desc":"Customised Large-Bore Ordnance Tube","arc":"front","state":"<span class='blink' style='color:red'>Malfunction</span>"},{"name":"Tube Four","desc":"Customised Large-Bore Ordnance Tube","arc":"front","state":"Reloading"}],"shield_array":[{"name":"Port Shield Generator","desc":"Standard Imperial Void Shield","state":"Inactive"},{"name":"Starboard Shield Generator","desc":"Standard Imperial Void Shield","state":"Inactive"}],"auspex_array":[{"name":"Primary Auspex","desc":"Doppler-Auspex","state":"Passive Mode"}],"turret_array":[{"name":"Primary Turret Cluster","desc":"Quad Vulcan Point Defence","state":"Inactive"}]}; //wip
+
+//display_status(status); //wip
+//display_event_log(status); //wip
+
+function display_status(concordia_cobra){
+
+	$("#general_order").html(concordia_cobra.general_order);
+	$("#weapons_array").empty();
+	$("#shield_array").empty();
+	$("#auspex_array").empty();
+	$("#turret_array").empty();
+	$("#reactor_array").empty();
+	$("#valve_array").empty();
+
+	for (var i=0;i<concordia_cobra.weapons_array.length;i++){
+        $("#weapons_array").append("<div><span class='name'>"+concordia_cobra.weapons_array[i].name + "</span><span class='state'>" + concordia_cobra.weapons_array[i].state + "</span></div><div class='desc'>" + concordia_cobra.weapons_array[i].desc + "</div>");
+	};
+
+	for (var i=0;i<concordia_cobra.shield_array.length;i++){
+        $("#shield_array").append( "<div><span class='name'>" +concordia_cobra.shield_array[i].name + "</span><span class='state'>" + concordia_cobra.shield_array[i].state + "</span></div><div class='desc'>" + concordia_cobra.shield_array[i].desc + "</div>");    
+ 	};
+
+	for (var i=0;i<concordia_cobra.auspex_array.length;i++){
+        $("#auspex_array").append("<div><span class='name'>" +concordia_cobra.auspex_array[i].name + "</span><span class='state'>" + concordia_cobra.auspex_array[i].state + "</span></div><div class='desc'>" + concordia_cobra.auspex_array[i].desc + "</div>");
+	};
+
+	for (var i=0;i<concordia_cobra.turret_array.length;i++){
+        $("#turret_array").append("<div><span class='name'>" +concordia_cobra.turret_array[i].name + "</span><span class='state'>" + concordia_cobra.turret_array[i].state + "</span></div><div class='desc'>" + concordia_cobra.turret_array[i].desc + "</div>");
+	};
+
+	for (var i=0;i<concordia_cobra.reactor_array.length;i++){
+        $("#reactor_array").append("<div><span class='name'>" +concordia_cobra.reactor_array[i].name + "</span><span class='state'>" + concordia_cobra.reactor_array[i].state + "</span></div><div class='desc'>" + concordia_cobra.reactor_array[i].desc + "</div>");
+	};
+
+	for (var i=0;i<concordia_cobra.valve_array.length;i++){
+        $("#valve_array").append("<div><span class='name'>" +concordia_cobra.valve_array[i].name + "</span><span class='state'>" + concordia_cobra.valve_array[i].state + "</span></div><div class='desc'>" + concordia_cobra.valve_array[i].desc + "</div>");
+	};
+}
+
+function display_event_log(concordia_cobra){	//test this stuff!
+
+	//console.log("Status received:");
+	
+	$("#event_content").empty();
+	for (var i=0; i<concordia_cobra.event_log.length-1;i++){
+		$("#event_content").append(concordia_cobra.event_log[i]+"<br>");
+	}
+	printSentence("event_content",concordia_cobra.event_log[concordia_cobra.event_log.length-1],50);
+}
+
+//play_sound("ping.mp3"); //requires "permission in browser by interaction?"
+/*
+var audio = new Audio("ping.mp3");
+audio.play();
+*/
+  
+function play_sound(sound){
+  var audio = new Audio(sound);
+  audio.play();
+}
+var last_ship_state = {};
+  
+function update_status() {
+	$.get("/status/"+current_seed,function(data) {
+    //console.log(data);
+    
+    if(data.ship_state) {data.ship_state = JSON.parse(data.ship_state)};
+    if (JSON.stringify(last_ship_state) !== JSON.stringify(data.ship_state)) {
+      //play_sound("ping.mp3")}
+      console.log("New data!");
+      display_status(data.ship_state);
+      if (JSON.stringify(last_ship_state.event_log) !== JSON.stringify(data.ship_state.event_log)) {display_event_log(data.ship_state)};
+      
+      last_ship_state = data.ship_state;
+      
+    }
+    
+	} );
+}
+
+function display_clock(){
+	var now = new Date();
+	// Get the hours, minutes and seconds from the current time
+        var hours = now.getHours();
+        var minutes = now.getMinutes();
+        var seconds = now.getSeconds();
+ 
+        // Format hours, minutes and seconds
+        if (hours < 10) {
+ 	       hours = "0" + hours;
+        }
+        if (minutes < 10) {
+           minutes = "0" + minutes;
+        }
+        if (seconds < 10) {
+           seconds = "0" + seconds;
+        }
+ 
+        // Sets the elements inner HTML value to our clock data
+        document.getElementById("clock").innerHTML = hours + "<span style='font-family:ticking timebomb bb'>:</span>" + minutes + "<span style='font-family:ticking timebomb bb'>:</span>" + seconds;
+}
+
+function display_marquees(){
+	var marquee_data = ["An open mind is like a fortress with its gates unbarred and unguarded","Thought begets heresy: Heresy begets retribution","Hope is the first step on the road to disappointment","Innocence proves nothing","There is no such thing as innocence, only degrees of guilt", "Blessed is the mind too small to doubt","The Known is but a shadow of the Knowable", "Knowledge is power, hide it well", "Knowledge is power, guard it well", "A small mind is a tidy mind", "A small mind is easily filled with faith", "An empty mind is a loyal mind", "Be strong in your ignorance","Doubt is the open gate through which slips the most fatal of enemies","Ignorance is a virtue","Ignorance is no excuse","The population needs deception, so deceive them", "The difference between heresy and treachery is ignorance","That which is unknown and unseen always commands the greatest fear", "Only the awkward question; only the foolish ask twice", "Victory needs no explanation; defeat allows none", "Success is commemorated, failure merely remembered","The rewards of tolerance are treachery and betrayal","Tolerance is a sign of weakness","No battle was every won that was poorly planned. No plan ever succeeded that was poorly conceived", "Pain is an illusion of the senses, despair is an illusion of the mind.","Even a person who has nothing can still give hir life", "Doubt is the open gate through which slips the most fatal of enemies", "A good soldier obeys without question. A good officer commands without doubt","To admit defeat is to blaspheme against the Emperor","For those who seek perfection there can be no rest on this side of the grave","Innocence proves nothing","Only in death does duty end","No man died in the Emperor's service that died in vain","Beginning reform is beginning revolution","Educate men without faith and you but make them clever devils","Success is measured in blood; yours or your enemy?s","Burn the heretic. Kill the mutant. Purge the unclean","It is better to die for the Emperor than to live for yourself","Fear denies faith","Foolish are those who fear nothing, yet claim to know everything","Brave are they who know everything yet fear nothing","Happiness is a delusion of the weak","All souls call out for salvation","Life is the Emperor's currency, spend it well","A suspicious mind is a healthy mind","Cowards die in shame","Faith without deeds is worthless","True Happiness stems only from Duty","The blood of martyrs is the seed of the Imperium","Heresy grows from idleness","There is only the Emperor, and he is our shield and protector","Damnation is Eternal","Know the Mutant; Kill the Mutant","To Question is to doubt","Prayer cleanses the soul, Pain cleanses the body","Zeal is its own Excuse","Work earns Salvation","Hatred is the emperor's greatest gift to humanity","The roar of engines, the recoil of cannons. That is where the true joy of battle lies", "True justice is quite simply the will of the Emperor","To the darkness bring fire. To the ignorant bring faith"]; //quotes here
+
+	$("#marquee_top").html(marquee_data[randomizer(0,marquee_data.length)]);
+	$("#marquee_bottom").html(marquee_data[randomizer(0,marquee_data.length)]);
+}
+
+function randomizer (min, max) {	
+	return Math.floor(Math.random() * (max-min+1)) + min;
+};
+
+function printSentence(id, sentence, speed){
+  var index=0;
+  var intObject = setInterval(function() {
+    document.getElementById(id).innerHTML+=sentence[index]; 
+    index++;
+    if(index==sentence.length){
+      clearInterval(intObject);
+    }
+  }, speed);
+}
+
+update_status();
+
+update=setInterval(function(){update_status();},1000);
+//update_clock=setInterval(function(){display_clock();},1000);
+update_marquee=setInterval(function(){display_marquees();},300*1000);
+
+</script>
+</body>
+</html>
+
+ 

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>Lead Angle Calculator</title>
+
+<style>
+
+*{
+  font-size:20px;
+}
+div {
+  margin:auto;
+  width: 450px;
+  border: 1px solid black;
+  padding: 50px;
+}
+
+input {
+  float: right;
+}
+
+</style>
+</head>
+<body>
+  <div>
+  Target Speed    <input id="target_speed"><br><br>
+  Torpedo Speed	  <input id="torpedo_speed" value="60"><br><br>
+  Target Course   <input id="target_course"><br><br>
+  Target Bearing	  <input id="target_bearing"><br><br>
+  <button id="calculate_shot" onclick="calculate_shot_button()">Calculate</button><br><br>
+  Launch Bearing: <span id="result"></span>
+  </div>
+<script>
+function calculate_lead_angle(bow_angle, target_speed, torpedo_speed) {
+  return (180/Math.PI)*Math.asin(target_speed/(torpedo_speed/Math.sin((Math.PI/180)*bow_angle)));
+}
+
+function calculate_bow_angle(target_course, target_bearing){
+  if (target_bearing > 180 && target_course < 180){
+    return Math.abs(target_bearing-180)-target_course;
+  }
+  else if (target_bearing < 180 && target_course < 180){
+    return Math.abs(target_bearing+180)-target_course;
+  }
+  else if (target_bearing > 180 && target_course > 180){
+    return target_course-Math.abs(target_bearing-180);
+  }
+  else if (target_bearing < 180 && target_course > 180){
+    return target_course-Math.abs(target_bearing+180);
+  }
+}
+
+function calculate_shot(target_course, target_bearing,target_speed, torpedo_speed){
+  var shot_bearing;
+  if (target_course < 180){
+    shot_bearing = target_bearing + calculate_lead_angle(calculate_bow_angle(target_course,target_bearing),target_speed,torpedo_speed);
+  }
+  else if (target_course > 180) {
+    shot_bearing = target_bearing - calculate_lead_angle(calculate_bow_angle(target_course,target_bearing),target_speed,torpedo_speed);
+  }
+  if (shot_bearing > 360){
+    return shot_bearing-360;
+  }
+  else if (shot_bearing < 360){
+    return shot_bearing;
+  }
+}
+
+function calculate_shot_button(){
+	document.getElementById("result").innerHTML = calculate_shot(parseFloat(document.getElementById("target_course").value),parseFloat(document.getElementById("target_bearing").value),parseFloat(document.getElementById("target_speed").value),parseFloat(document.getElementById("torpedo_speed").value))
+}
+
+</script>
+</body>
+</html>

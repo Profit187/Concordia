@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>Root</title>
+</head>
+<body>
+  Seed: <input id=seed value="1" onchange="set_seed()"></input><br><br>
+    
+  Where do you want to go from here?<br><br>
+
+  
+  OIS:<br><br>
+  <a id="OIS_Control" href="/ois_control/1">OIS Control</a><br><br>
+  <a id="helm_output" href="/helm_output/1">Helm Output</a> (OIS Output)<br><br>
+  <a id="contacts_output" href="/contacts_output/1">Contacts Output</a> (OIS Output)<br><br>
+  Status:<br><br>
+	<a id="status_control" href="/status_control/1">Status Control</a><br><br>
+  <a id="status_output" href="/status_output/1">Status Output</a><br><br>
+
+  Testing: <br><br>
+  <a id="status_control" href="/status_control_new/1">Status Control (new)</a><br><br>
+  <a id="status_output" href="/status_output_new/1">Status Output (new)</a><br><br>
+  <br>Auxiliaries:<br><br>
+	<a href="/shot_calc">TDC</a><br><br>
+	<a href="/local_screensaver">Screensaver</a><br><br>
+
+  
+<script>
+  function set_seed(){
+  var seed = document.getElementById("seed").value;
+  document.getElementById("OIS_Control").href = `/ois_control/${seed}`;
+  document.getElementById("helm_output").href = `/helm_output/${seed}`;
+  document.getElementById("contacts_output").href = `/contacts_output/${seed}`;
+  document.getElementById("status_control").href = `/status_control/${seed}`;
+  document.getElementById("status_output").href = `/status_output/${seed}`;
+  document.getElementById("status_control").href = `/status_control_new/${seed}`;
+  document.getElementById("status_output").href = `/status_output_new/${seed}`;
+  
+  }
+  
+</script>  
+</body>
+</html>

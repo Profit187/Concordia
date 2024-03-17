@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="/jquery.js"></script>
+<meta charset=utf-8 />
+<title>Status Control</title>
+
+<style>
+
+.blink {
+    animation: blink 1s steps(5, start) infinite;
+}
+@keyframes blink {
+    to {
+        visibility: hidden;
+    }
+}
+
+input {
+  width: 450px;
+}
+
+.input_log {
+  width: 1000px
+}
+
+#slot {
+  width: 100px;
+}
+
+</style>
+</head>
+<body>
+  
+  <button id="start_update">Start Update</button><br><br>
+  
+  <div id="general_order">
+      General Order<br>
+      <div id="current_general_order"></div>
+      <div id="general_order_buttons">
+          <input id ="input_general_order"> 
+          <button id="set_general_order">Set</button>
+          <button id="set_secure">Secure</button>
+          <button id="set_battlestations">Battlestations</button>
+          <button id="set_silent">Silent Running</button>
+          <button id="set_brace">Brace for Impact</button>
+      </div>
+  </div> 
+
+  <div id="weapons_array">
+      Weapons Array Status<br>
+  </div>
+  
+  <div id="shield_array">
+      Shield Array Status<br>
+  </div>
+  <div id="auspex_array">
+      Auspex Array Status<br>
+  </div>
+  <div id="turret_array">
+      Turret Array Status<br>
+  </div>
+  <div id="reactor_array">
+      Reactor Status<br>
+  </div>
+  <div id="valve_array">
+      Valve Status<br>
+  </div>
+
+  Event Log:<br>
+  <div id="event_log_control">
+      <div id="event_log"></div>
+  </div>
+  
+<script>
+function Weapon_system(data) {
+  this.name = data.name; //e.g. "Port Macro Broadside"
+  this.desc = data.desc; //e.g. "Range 300 VU Strength 8 Standard"
+  this.state = ""; // Muzzled/Ready/Reloading/Inoperable
+}
+
+function Auspex(data) {
+  this.name = data.name; //e.g. "Primary Auspex"
+  this.desc = data.desc;
+  this.state = ""; // Active/Passive
+}
+
+function Shield(data){
+  this.name = data.name; //e.g. "Port Shield"
+  this.desc = data.desc;
+  this.state = ""; //e.g "Full Strength"
+}
+
+function Turrets(data){
+  this.name = data.name; //e.g. "Primary Turret Array"
+  this.desc = data.desc;
+  this.state = ""; // Muzzled/Anti-torp/Anti-flight
+}
+
+function Reactor(data){
+  this.name = data.name; //e.g. "Primary Reactor"
+  this.desc = data.desc;
+  this.state = ""; // "pressure critical"
+}
+
+function Valve(data){
+  this.name = data.name; //e.g. "Primary Vent"
+  this.desc = data.desc;
+  this.state = ""; // "50%"
+}
+
+function Ship_state(data){
+  this.general_order = false; // e.g. "brace for impact"
+  this.event_log = ["+++"];
+  
+  this.weapons_array = data.weapons_array;
+  this.shield_array = data.shield_array;
+  this.auspex_array = data.auspex_array;
+  this.turret_array = data.turret_array;
+  this.reactor_array = data.reactor_array;
+  this.valve_array = data.valve_array;
+}
+
+
+const temp_seed = window.location.pathname.split('/');
+var current_seed = temp_seed[temp_seed.length-1];
+console.log(current_seed);
+  
+function save_state(slot){
+   $.post('/status/'+current_seed,{ship_state: JSON.stringify(concordia_cobra)} );
+}
+
+function load_state(slot){
+  $.get('/status/'+slot, function(data){
+    data = JSON.parse(data);
+    concordia_cobra = data.state;
+  });
+}
+
+//initialise the state
+concordia_cobra = new Ship_state({
+  weapons_array: [
+    new Weapon_system({name: "Dorsal Macrocannon", desc: "Mars-pattern - Range 300 VU, 270 degrees frontal arc"}),
+    new Weapon_system({name: "Tube I", desc: "Carronaded Gryphonne-pattern Torpedo Tube"}),
+    new Weapon_system({name: "Tube II", desc: "Carronaded Gryphonne-pattern Torpedo Tube"}),
+    new Weapon_system({name: "Tube III", desc: "Carronaded Gryphonne-pattern Torpedo Tube"}),
+    new Weapon_system({name: "Tube IV", desc: "Carronaded Gryphonne-pattern Torpedo Tube"})
+  ],
+  shield_array: [
+    new Shield({name: "Primaris Shield Generator", desc: "Helios-pattern Void Shield"})
+  ],
+  auspex_array: [
+    new Auspex({name: "Alpha Auspex Array", desc: "Mark CCI-b Augur Array"})
+  ],
+  turret_array: [
+    new Turrets({name: "Turret Cluster Prime", desc: "Flamberge-pattern Quad Vulcan Point Defence Battery"})
+  ],
+  reactor_array: [
+    new Reactor({name: "Plasma Reactors Majoris", desc: "Jovian class II Plasma Reactor"})
+  ],
+  valve_array: [
+    new Valve({name: "Primary Overflow Control", desc: "Reactor overflow ventilation system"})
+  ]
+});
+
+$("#start_update").click(function(){
+    update=setInterval(function(){ 
+        save_state($('#slot').val());
+        update_status();   
+    },1000);
+});
+
+//general order controls
+$("#set_general_order").click(function(){
+  concordia_cobra.general_order = $("#input_general_order").val();
+});
+$("#set_secure").click(function(){
+  concordia_cobra.general_order = false;
+});
+$("#set_battlestations").click(function(){
+  concordia_cobra.general_order = "<span class='blink' style='color:red;font-variant:all-caps;'>BATTLESTATIONS</span>";
+});
+$("#set_silent").click(function(){
+  concordia_cobra.general_order = "<span class='blink' style='color:gray;font-variant:small-caps;'>SILENT RUNNING</span>";
+});
+$("#set_brace").click(function(){
+  concordia_cobra.general_order = "<span class='blink' style='color:yellow;font-variant:small-caps;'>BRACE FOR IMPACT</span>"; //add blink?
+});
+
+function timestamp(){
+    var time=new Date();
+    return "[" + time.getDay()+ ":" + time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds() + "] ";
+}
+
+//Weapons array controls
+for (var i=0;i<concordia_cobra.weapons_array.length;i++){
+    append_WA_buttons(i);
+    bind_WA_handlers(i);
+};
+
+function append_WA_buttons(i){
+    $('#weapons_array').append('<div id="WA_'+(i+1)+'"></div><div id="WA_'+(i+1)+'_buttons"><input id ="input_WA_'+(i+1)+'"><button id="set_status_WA_'+(i+1)+'">Set</button><button id="set_empty_WA_'+(i+1)+'">Empty</button><button id="set_ready_WA_'+(i+1)+'">Ready</button><button id="set_loaded_WA_'+(i+1)+'">Loaded: Standard Torpedo</button><button id="set_reloading_WA_'+(i+1)+'">Reloading</button><button id="set_damaged_WA_'+(i+1)+'">Damaged</button></div>')
+}
+
+function bind_WA_handlers(i) {
+$("#set_status_WA_"+(i+1)).click(function(){
+        concordia_cobra.weapons_array[i].state = $("#input_WA_"+(i+1)).val();
+        
+    });
+    $("#set_empty_WA_"+(i+1)).click(function(){
+        concordia_cobra.weapons_array[i].state = "Empty"; 
+        
+    });
+    $("#set_ready_WA_"+(i+1)).click(function(){
+        concordia_cobra.weapons_array[i].state = "Ready";
+         
+    });
+    $("#set_loaded_WA_"+(i+1)).click(function(){
+        concordia_cobra.weapons_array[i].state = "Loaded: Standard Torpedo";
+         
+    });
+    $("#set_reloading_WA_"+(i+1)).click(function(){
+        concordia_cobra.weapons_array[i].state = "<span class='blink' style='color:orange'>Reloading</span>"; 
+        
+    });
+    $("#set_damaged_WA_"+(i+1)).click(function(){
+        concordia_cobra.weapons_array[i].state = "<span class='blink' style='color:red'>Malfunction</span>";
+        
+    });
+}
+
+//Shield array controls
+for (var i=0;i<concordia_cobra.shield_array.length;i++){
+    append_SA_buttons(i);
+    bind_SA_handlers(i);    
+};
+
+function append_SA_buttons(i) {
+    $('#shield_array').append('<div id="SA_'+(i+1)+'"></div><div id="SA_'+(i+1)+'1_buttons"><input id ="input_SA_'+(i+1)+'"><button id="set_status_SA_'+(i+1)+'">Set</button><button id="set_inactive_SA_'+(i+1)+'">Inactive</button><button id="set_active_SA_'+(i+1)+'">Active</button><button id="set_recharging_SA_'+(i+1)+'">Recharging</button><button id="set_damaged_SA_'+(i+1)+'">Malfunction</button></div>');
+}
+function bind_SA_handlers(i) {
+$("#set_status_SA_"+(i+1)).click(function(){
+        concordia_cobra.shield_array[i].state = $("#input_SA_"+(i+1)).val();
+        
+    });
+    $("#set_inactive_SA_"+(i+1)).click(function(){
+        concordia_cobra.shield_array[i].state = "Inactive"; 
+        
+    });
+    $("#set_active_SA_"+(i+1)).click(function(){
+        concordia_cobra.shield_array[i].state = "Active"; 
+        
+    });
+    $("#set_recharging_SA_"+(i+1)).click(function(){
+        concordia_cobra.shield_array[i].state = "<span class='blink' style='color:orange'>Recharging</span>";
+        
+    });
+    $("#set_damaged_SA_"+(i+1)).click(function(){
+        concordia_cobra.shield_array[i].state = "<span class='blink' style='color:red'>Malfunction</span>";
+        
+    });
+}
+
+//Auspex array controls
+for (var i=0;i<concordia_cobra.auspex_array.length;i++){
+    append_AA_buttons(i);
+    bind_AA_handlers(i);
+};
+
+function append_AA_buttons(i) {
+    $('#auspex_array').append('<div id="AA_'+(i+1)+'"></div><div id="AA_'+(i+1)+'_buttons"><input id ="input_AA_'+(i+1)+'"><button id="set_status_AA_'+(i+1)+'">Set</button><button id="set_passive_AA_'+(i+1)+'">Passive Mode</button><button id="set_active_AA_'+(i+1)+'">Active Mode</button><button id="set_jammed_AA_'+(i+1)+'">Jammed</button><button id="set_damaged_AA_'+(i+1)+'">Malfunction</button></div>');
+}
+function bind_AA_handlers(i) {
+$("#set_status_AA_"+(i+1)).click(function(){
+        concordia_cobra.auspex_array[i].state = $("#input_AA_"+(i+1)).val();
+        
+    });
+    $("#set_passive_AA_"+(i+1)).click(function(){
+        concordia_cobra.auspex_array[i].state = "Passive Mode"; 
+        
+    });
+    $("#set_active_AA_"+(i+1)).click(function(){
+        concordia_cobra.auspex_array[i].state = "Active Mode"; 
+        
+    });
+    $("#set_jammed_AA_"+(i+1)).click(function(){
+        concordia_cobra.auspex_array[i].state = "<span class='blink' style='color:brown'>Jammed</span>"; 
+        
+    });
+    $("#set_damaged_AA_"+(i+1)).click(function(){
+        concordia_cobra.auspex_array[i].state = "<span class='blink' style='color:red'>Malfunction</span>";
+        
+    });
+}
+
+//Turret array controls
+for (var i=0;i<concordia_cobra.turret_array.length;i++){
+    append_TA_buttons(i);
+    bind_TA_handlers(i);
+};
+
+function append_TA_buttons(i){
+    $('#turret_array').append('<div id="TA_'+(i+1)+'"></div><div id="TA_'+(i+1)+'_buttons"><input id ="input_TA_'+(i+1)+'"> <button id="set_status_TA_'+(i+1)+'">Set</button><button id="set_inactive_TA_'+(i+1)+'">Inactive</button><button id="set_anti-AC_TA_'+(i+1)+'">Active: Tracking Attack Craft</button><button id="set_anti-torp_TA_'+(i+1)+'">Active: Tracking Torpedoes</button><button id="set_reloading_TA_'+(i+1)+'">Reloading</button><button id="set_damaged_TA_'+(i+1)+'">Malfunction</button></div>');
+}
+
+function bind_TA_handlers(i) {
+$("#set_status_TA_"+(i+1)).click(function(){
+        concordia_cobra.turret_array[i].state = $("#input_TA_"+(i+1)).val();
+        
+    });
+    $("#set_inactive_TA_"+(i+1)).click(function(){
+        concordia_cobra.turret_array[i].state = "Inactive";
+        
+    });
+    $("#set_anti-AC_TA_"+(i+1)).click(function(){
+        concordia_cobra.turret_array[i].state = "Active: Tracking Attack Craft";
+         
+    });
+    $("#set_anti-torp_TA_"+(i+1)).click(function(){
+        concordia_cobra.turret_array[i].state = "Active: Tracking Torpedoes";
+         
+    });
+    $("#set_reloading_TA_"+(i+1)).click(function(){
+        concordia_cobra.turret_array[i].state = "<span class='blink' style='color:orange'>Reloading</span>";
+        
+    });
+    $("#set_damaged_TA_"+(i+1)).click(function(){
+        concordia_cobra.turret_array[i].state = "<span class='blink' style='color:red'>Malfunction</span>";
+        
+    });
+}
+
+//Reactor Array controls
+for (var i=0;i<concordia_cobra.reactor_array.length;i++){
+    append_RA_buttons(i);
+    bind_RA_handlers(i);
+};
+
+function append_RA_buttons(i){
+    $('#reactor_array').append('<div id="RA_'+(i+1)+'"></div><div id="RA_'+(i+1)+'_buttons"><input id ="input_RA_'+(i+1)+'"> <button id="set_status_RA_'+(i+1)+'">Set</button><button id="set_nominal_RA_'+(i+1)+'">Nominal</button><button id="set_alert_RA_'+(i+1)+'">Alert</button><button id="set_critical_RA_'+(i+1)+'">Critical</button><button id="set_unstable_RA_'+(i+1)+'">Unstable</button><button id="set_damaged_RA_'+(i+1)+'">Malfunction</button></div>');
+}
+
+function bind_RA_handlers(i) {
+$("#set_status_RA_"+(i+1)).click(function(){
+        concordia_cobra.reactor_array[i].state = $("#input_RA_"+(i+1)).val();
+        
+    });
+    $("#set_nominal_RA_"+(i+1)).click(function(){
+        concordia_cobra.reactor_array[i].state = "Plasma Pressure Nominal";
+        
+    });
+    $("#set_alert_RA_"+(i+1)).click(function(){
+        concordia_cobra.reactor_array[i].state = "<span class='blink' style='color:red'>Alert!</span>";
+         
+    });
+    $("#set_critical_RA_"+(i+1)).click(function(){
+        concordia_cobra.reactor_array[i].state = "<span class='blink' style='color:red'>Plasma Pressure Critical</span>";
+         
+    });
+    $("#set_unstable_RA_"+(i+1)).click(function(){
+        concordia_cobra.reactor_array[i].state = "<span class='blink' style='color:orange'>Reactor Unstable</span>"; //add timer?
+        
+    });
+    $("#set_damaged_RA_"+(i+1)).click(function(){
+        concordia_cobra.reactor_array[i].state = "<span class='blink' style='color:red'>Malfunction</span>";
+        
+    });
+}
+//Valve Array controls
+for (var i=0;i<concordia_cobra.valve_array.length;i++){
+    append_VA_buttons(i);
+    bind_VA_handlers(i);
+};
+
+function append_VA_buttons(i){
+    $('#valve_array').append('<div id="VA_'+(i+1)+'"></div><div id="VA_'+(i+1)+'_buttons"><input id ="input_VA_'+(i+1)+'"> <button id="set_status_VA_'+(i+1)+'">Set</button><button id="set_open_VA_'+(i+1)+'">Main Valves Open</button><button id="set_closed_VA_'+(i+1)+'">Main Valves Closed: Emergency Valves Open</button><button id="set_80_VA_'+(i+1)+'">Emergency Valve 80%</button><button id="set_60_VA_'+(i+1)+'">Emergency Valve 60%</button><button id="set_40_VA_'+(i+1)+'">Emergency Valve 40%</button><button id="set_EV_VA_'+(i+1)+'">Emergency Valve at [fill]</button><button id="set_damaged_VA_'+(i+1)+'">Malfunction</button></div>');
+}
+
+function bind_VA_handlers(i) {
+$("#set_status_VA_"+(i+1)).click(function(){
+        concordia_cobra.valve_array[i].state = $("#input_VA_"+(i+1)).val();
+        
+    });
+    $("#set_open_VA_"+(i+1)).click(function(){
+        concordia_cobra.valve_array[i].state = "Main Valves Open"; 
+        
+    });
+    $("#set_closed_VA_"+(i+1)).click(function(){
+        concordia_cobra.valve_array[i].state = "<span style='font-size: 25px'>Main Valves Closed: Emergency Valves Open</span>";
+         
+    });
+    $("#set_80_VA_"+(i+1)).click(function(){
+        concordia_cobra.valve_array[i].state = "<span style='font-size: 25px'>Main Valves Closed: Emergency Valves at 80%</span>";
+         
+    });
+    $("#set_60_VA_"+(i+1)).click(function(){
+        concordia_cobra.valve_array[i].state = "<span style='font-size: 25px'>Main Valves Closed: Emergency Valves at 60%</span>"; 
+        
+    });
+    $("#set_40_VA_"+(i+1)).click(function(){
+        concordia_cobra.valve_array[i].state = "<span style='font-size: 25px'>Main Valves Closed: Emergency Valves at 40%</span>"; 
+        
+    });
+    $("#set_EV_VA_"+(i+1)).click(function(){
+        $('#input_VA_'+(i+1)).val("<span style='font-size: 25px'>Main Valves Closed: Emergency Valves at [unknown]</span>"); 
+        
+    });
+    $("#set_damaged_VA_"+(i+1)).click(function(){
+        concordia_cobra.valve_array[i].state = "<span class='blink' style='color:red'>Malfunction</span>";
+        
+    });
+}
+//event log controls
+
+for (var i=0;i<5;i++){        //number of log input rows here!
+    append_EL_buttons(i);
+    bind_EL_handlers(i);
+}
+
+function append_EL_buttons(i){
+    $('#event_log_control').append('<input id="input_log_'+i+'" class="input_log"> <button id="send_to_log_'+i+'">Send</button><button id="new_contact_'+i+'">New Contact (template)</button><button id="contact_update_'+i+'">Contact Update (template)</button><button id="contact_lost_'+i+'">Contact Lost (template)</button><br><br>');
+}
+function bind_EL_handlers(i){
+    $('#send_to_log_'+i).click(function(){
+        concordia_cobra.event_log.push(timestamp() + " +++ " + $('#input_log_'+i).val() + " +++"); 
+    });
+    $('#new_contact_'+i).click(function(){
+      $('#input_log_'+i).val("New Contact: Designation [Pending] Bearing Unknown Distance Unknown Identification Unknown Classification Unknown Source Unknown "); 
+    });
+    $('#contact_update_'+i).click(function(){
+      $('#input_log_'+i).val("Contact Update: Designation [Pending] Bearing Unknown Distance Unknown Identification Unknown Classification Unknown Source Unknown "); 
+    });
+    $('#contact_lost_'+i).click(function(){
+      $('#input_log_'+i).val("Contact Lost: Designation [Pending] "); 
+    });
+}
+  
+$("#load_state").click(function(){
+  load_state($("#slot").val());
+});
+
+function update_status(){
+    $("#current_general_order").html(concordia_cobra.general_order);
+    for (var i=0;i<concordia_cobra.weapons_array.length;i++){
+        $('#WA_'+(i+1)).html(concordia_cobra.weapons_array[i].name + " " + concordia_cobra.weapons_array[i].desc + " " + concordia_cobra.weapons_array[i].state);
+    };
+    for (var i=0;i<concordia_cobra.shield_array.length;i++){
+        $('#SA_'+(i+1)).html(concordia_cobra.shield_array[i].name + " " + concordia_cobra.shield_array[i].desc + " " + concordia_cobra.shield_array[i].state);    
+    };
+    for (var i=0;i<concordia_cobra.auspex_array.length;i++){
+        $('#AA_'+(i+1)).html(concordia_cobra.auspex_array[i].name + " " + concordia_cobra.auspex_array[i].desc + " " + concordia_cobra.auspex_array[i].state);
+    };
+    for (var i=0;i<concordia_cobra.turret_array.length;i++){
+        $('#TA_'+(i+1)).html(concordia_cobra.turret_array[i].name + " " + concordia_cobra.turret_array[i].desc + " " + concordia_cobra.turret_array[i].state);
+    };
+    for (var i=0;i<concordia_cobra.reactor_array.length;i++){
+        $('#RA_'+(i+1)).html(concordia_cobra.reactor_array[i].name + " " + concordia_cobra.reactor_array[i].desc + " " + concordia_cobra.reactor_array[i].state);
+    };
+    for (var i=0;i<concordia_cobra.valve_array.length;i++){
+        $('#VA_'+(i+1)).html(concordia_cobra.valve_array[i].name + " " + concordia_cobra.valve_array[i].desc + " " + concordia_cobra.valve_array[i].state);
+    };
+    $('#event_log').empty();
+    for (var i=0; i<concordia_cobra.event_log.length;i++){
+        $('#event_log').append(concordia_cobra.event_log[i]+"<br>");
+    }
+}
+
+//add "blink" buttons?
+//add form for detailed contact sending?
+</script>
+</body>
+</html>

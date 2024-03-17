@@ -1,0 +1,424 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<script src="/jquery.js"></script>
+<meta charset=utf-8 />
+<title>Contacts Output</title>
+
+<style type="text/css" >
+
+body {
+	margin:0px;
+	padding:0px;
+	overflow: hidden;
+}
+
+@font-face {
+  font-family: "hultog";
+  src: url(/hultog.ttf);
+}
+
+@font-face {
+  font-family: "digital-7 mono";
+  src: url(/digital-7_mono.ttf);
+}
+
+.blink {
+    animation: blink 1s steps(5, start) infinite;
+}
+@keyframes blink {
+    to {
+        visibility: hidden;
+    }
+}
+
+.graphics {
+  position: absolute;
+}
+
+#background {
+  z-index: -3;
+}
+
+#overlay {
+  z-index: +2;
+}
+
+.blink {
+	animation: blink 1s steps(5, start) infinite;
+}
+
+@keyframes blink {
+    to {
+        visibility: hidden;
+    }
+}
+
+.marquee_left{
+    animation-name: marquee_left;
+    animation-timing-function: linear;
+    animation-duration:20s;
+    animation-iteration-count: infinite;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: block;
+    white-space: nowrap;
+}
+
+.marquee_right{
+    animation-name: marquee_right;
+    animation-timing-function: linear;
+    animation-duration:20s;
+    animation-iteration-count: infinite;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: block;
+    white-space: nowrap;
+}
+
+@keyframes marquee_left{
+    0%{
+        text-indent: 95%;
+}
+    100%{
+        text-indent: -80%;  
+    }
+}
+
+@keyframes marquee_right{
+    0%{
+        text-indent: -95%;
+}
+    100%{
+        text-indent: 80%;  
+    }
+}
+
+
+#marquee_top {
+  position: absolute;
+  /*border: 1px solid white;*/
+  width: 1565px;
+  top: 35px;
+  left: 180px;
+  font-family: "hultog",serif;
+  font-size: 72px;
+  font-variant: small-caps;
+  color: red; 
+}
+
+#marquee_bottom {
+  position: absolute;
+  /*border: 1px solid white;*/
+  width: 1565px;
+  top: 975px;
+  left: 180px;
+  font-family: "hultog",serif;
+  font-size: 72px;
+  font-variant: small-caps;
+  color: red;
+}
+
+#clock {
+  font-family: "digital-7 mono",serif;
+  position: absolute;
+  top: 740px;
+  left: 620px;
+  width: 680px;
+  font-size: 220px;
+  color: red;
+  /*border: 1px solid white;*/
+}
+
+
+#status_left {
+	position: absolute;
+	top: 200px;
+	left: 60px;
+	font-size: 35px;
+	color: white;
+	/*width: 900px;*/
+	height: 435px;
+	font-family: "hultog",serif;
+	/*border: 1px solid white;*/
+}
+
+.desc {
+	font-size: 18px;
+}
+
+.identity {
+	display: inline-block;
+	text-align:center;
+	width: 725px;
+	margin-left: 5px;
+}
+
+.range {
+	display: inline-block;
+	text-align:center;
+	width: 240px;
+	margin-left: 5px;
+}
+
+.bearing {
+	display: inline-block;
+	text-align:center;
+	width: 240px;
+	margin-left: 5px;
+}
+
+.speed {
+	display: inline-block;
+	text-align:center;
+	width: 240px;
+	margin-left: 5px;
+}
+
+.heading {
+	display: inline-block;
+	text-align:center;
+	width: 260px;
+	margin-left: 5px;
+}
+
+#headline {
+	position: absolute;
+	top: 140px;
+	left: 850px;
+	/*width: 300px;*/
+	font-size: 45px;
+	color: green;
+	font-family: "hultog",serif;
+	/*border: 1px solid white;*/
+}
+
+#notrack {
+	position: absolute;
+	top: 380px;
+	left: 750px;
+	font-size: 60px;
+	color: white;
+	font-family: "hultog",serif;
+}
+
+</style>
+</head>
+<body>
+
+	<img class="graphics" id="background" src="/HelmConsoleGreen_border.png">
+	<img class="graphics" id="overlay" src="/FINAL_InterlacedOverlay.png">
+
+	<div class="marquee_left" id="marquee_top">An open mind is like a fortress with its gates unbarred and unguarded</div>
+  	<div class="marquee_right" id="marquee_bottom">Thought begets heresy: Heresy begets retribution</div>
+	
+	<div id="clock"></div>
+	
+	<div id="headline">Tracked Contacts</div>
+	
+	<div id="status_left"></div>
+
+	<div id="notrack">No Current Tracking</div>
+  	  
+<script>
+
+var current_seed = window.location.pathname.split('/');
+current_seed = current_seed.pop();
+console.log(current_seed);
+  
+function display_state(){
+	$.get("/state/"+current_seed,function(data){
+				
+    if (data.space_objects) {
+    data.space_objects = JSON.parse(data.space_objects);
+
+		list_tracked(data);
+		display_clock();
+    }
+	});
+}
+
+//goes through data and prints tracked objects
+function list_tracked(data) {
+	$('#status_left').empty();
+	var notrack = true;
+	$("#notrack").hide();
+	$("#headline").show();
+	for (var i = 1; i < data.space_objects.length; i++) {
+		if (data.space_objects[i].tracked) {
+			notrack = false;
+			$('#status_left').append(`<div id='track_for_object_${i}'><span class='identity' id='identity_for_object_${i}'></span></div>`);
+
+			if (data.space_objects[i].threat == "uncertain") {
+				document.getElementById(`track_for_object_${i}`).style.color = "white";
+			}
+			if (data.space_objects[i].threat == "neutral") {
+				document.getElementById(`track_for_object_${i}`).style.color = "orange";
+			}
+			if (data.space_objects[i].threat == "friendly") {
+				document.getElementById(`track_for_object_${i}`).style.color = "green";
+			}
+			if (data.space_objects[i].threat == "hostile") {
+				document.getElementById(`track_for_object_${i}`).style.color = "red";
+			}
+			if (data.space_objects[i].threat == "alert") {
+				document.getElementById(`track_for_object_${i}`).style.color = "red";
+				document.getElementById(`track_for_object_${i}`).className = "blink";
+			}
+			if (data.space_objects[i].threat == "inert") {
+				document.getElementById(`track_for_object_${i}`).style.color = "grey";
+			}
+
+			if (data.space_objects[i].identity_known){
+				$(`#identity_for_object_${i}`).append(`<span>${data.space_objects[i].name} </span>`);
+			}
+			else if (!data.space_objects[i].type_known){
+				$(`#identity_for_object_${i}`).append("<span>Unidentified Contact</span>");
+			}
+			else {
+				$(`#identity_for_object_${i}`).append("<span>Unidentified </span>");
+			}
+			if (data.space_objects[i].class_known){
+				$(`#identity_for_object_${i}`).append(`<span> ${data.space_objects[i].classification} Class </span>"`);
+			}
+			else {
+				$(`#identity_for_object_${i}`).append("<span> </span>");
+			}
+			if (data.space_objects[i].type_known){
+				$(`#identity_for_object_${i}`).append(`<span> ${data.space_objects[i].type} </span>`);
+			}
+			else {
+				$(`#identity_for_object_${i}`).append("<span> </span>");
+			}
+
+			if (data.space_objects[i].bearing_known){
+				$(`#track_for_object_${i}`).append("<span class='bearing'>Bearing "+zeroPad((Math.round(compute_ois_bearing(data.space_objects[0],data.space_objects[i])*100)/100).toFixed(0),3)+"</span>");
+			}
+			else {
+				$(`#track_for_object_${i}`).append("<span class='bearing'>Bearing Unknown</span>");
+			}
+			if (data.space_objects[i].range_known){
+				$(`#track_for_object_${i}`).append(`<span class='range'>Range ${round_distance(compute_ois_distance(data.space_objects[0],data.space_objects[i]))}</span>"`);
+			}
+			else {
+				$(`#track_for_object_${i}`).append("<span class='range'>Range Unknown</span>");
+			}
+			if (data.space_objects[i].speed_known){
+				$(`#track_for_object_${i}`).append(`<span class='speed'>Speed ${data.space_objects[i].current_speed.toFixed(0)}</span>`);
+			}
+			else {
+				$(`#track_for_object_${i}`).append("<span class='speed'>Speed Unknown</span>");
+			}
+			if (data.space_objects[i].heading_known){
+				$(`#track_for_object_${i}`).append(`<span class='heading'>Heading ${zeroPad((Math.round(data.space_objects[i].current_heading*100)/100).toFixed(0),3)}</span>`);
+			}
+			else {
+				$(`#track_for_object_${i}`).append("<span class='heading'>Heading Unknown</span>");
+			}
+
+			
+		}
+		
+	};
+	if (notrack){
+		$("#notrack").show();
+		$("#headline").hide();
+	}
+	
+}
+
+//rounds distance properly
+function round_distance(distance){
+	
+	if (distance > 5000) {
+		return Math.round(distance/500)*500;
+	}
+	else if (distance > 1000) {
+		return Math.round(distance/100)*100;
+	}
+	else if (distance > 500) {
+		return Math.round(distance/10)*10;
+	}
+	else if (distance > 100) {
+		return Math.round(distance/5)*5;
+	}
+	else {
+		return Math.round(distance);
+	}
+}
+
+//computes distance between two points
+function compute_distance(point_a, point_b) { 
+  return Math.sqrt(Math.pow(point_a[0]-point_b[0],2) + Math.pow(point_a[1]-point_b[1],2));
+}
+
+//computes distance between two ois
+function compute_ois_distance(ois_a, ois_b) { 
+  return compute_distance(ois_a.position, ois_b.position);
+}
+
+//computes (true) bearing between two points
+function compute_bearing(point_a, point_b) { 
+  var temp = 90-(180/Math.PI)*Math.atan2(point_b[1]-point_a[1], point_b[0]-point_a[0]);
+  if (temp < 0) return temp += 360;
+  else return temp;
+}
+            
+//computes (true) bearing between two ois
+function compute_ois_bearing(ois_a, ois_b) { 
+  return compute_bearing(ois_a.position, ois_b.position);
+}
+
+//zeroPadding function, ignores decimals
+function zeroPad(num, places) {
+  var zero = places - Math.floor(num).toString().length + 1;
+  return Array(+(zero > 0 && zero)).join("0") + num;
+}
+
+function display_clock(){
+	var now = new Date();
+	// Get the hours, minutes and seconds from the current time
+        var hours = now.getHours();
+        var minutes = now.getMinutes();
+        var seconds = now.getSeconds();
+ 
+        // Format hours, minutes and seconds
+        if (hours < 10) {
+ 	       hours = "0" + hours;
+        }
+        if (minutes < 10) {
+           minutes = "0" + minutes;
+        }
+        if (seconds < 10) {
+           seconds = "0" + seconds;
+        }
+ 
+        // Sets the elements inner HTML value to our clock data
+        document.getElementById("clock").innerHTML = `${hours}<span style='font-family:ticking timebomb bb'>:</span>${minutes}<span style='font-family:ticking timebomb bb'>:</span>${seconds}`;
+}
+
+function display_marquees(){
+	var marquee_data = ["An open mind is like a fortress with its gates unbarred and unguarded","Thought begets heresy: Heresy begets retribution","Hope is the first step on the road to disappointment","Innocence proves nothing","There is no such thing as innocence, only degrees of guilt", "Blessed is the mind too small to doubt","The Known is but a shadow of the Knowable", "Knowledge is power, hide it well", "Knowledge is power, guard it well", "A small mind is a tidy mind", "A small mind is easily filled with faith", "An empty mind is a loyal mind", "Be strong in your ignorance","Doubt is the open gate through which slips the most fatal of enemies","Ignorance is a virtue","Ignorance is no excuse","The population needs deception, so deceive them", "The difference between heresy and treachery is ignorance","That which is unknown and unseen always commands the greatest fear", "Only the awkward question; only the foolish ask twice", "Victory needs no explanation; defeat allows none", "Success is commemorated, failure merely remembered","The rewards of tolerance are treachery and betrayal","Tolerance is a sign of weakness","No battle was every won that was poorly planned. No plan ever succeeded that was poorly conceived", "Pain is an illusion of the senses, despair is an illusion of the mind.","Even a person who has nothing can still give hir life", "Doubt is the open gate through which slips the most fatal of enemies", "A good soldier obeys without question. A good officer commands without doubt","To admit defeat is to blaspheme against the Emperor","For those who seek perfection there can be no rest on this side of the grave","Innocence proves nothing","Only in death does duty end","No man died in the Emperor's service that died in vain","Beginning reform is beginning revolution","Educate men without faith and you but make them clever devils","Success is measured in blood; yours or your enemy?s","Burn the heretic. Kill the mutant. Purge the unclean","It is better to die for the Emperor than to live for yourself","Fear denies faith","Foolish are those who fear nothing, yet claim to know everything","Brave are they who know everything yet fear nothing","Happiness is a delusion of the weak","All souls call out for salvation","Life is the Emperor's currency, spend it well","A suspicious mind is a healthy mind","Cowards die in shame","Faith without deeds is worthless","True Happiness stems only from Duty","The blood of martyrs is the seed of the Imperium","Heresy grows from idleness","There is only the Emperor, and he is our shield and protector","Damnation is Eternal","Know the Mutant; Kill the Mutant","To Question is to doubt","Prayer cleanses the soul, Pain cleanses the body","Zeal is its own Excuse","Work earns Salvation","Hatred is the emperor's greatest gift to humanity","The roar of engines, the recoil of cannons. That is where the true joy of battle lies", "True justice is quite simply the will of the Emperor","To the darkness bring fire. To the ignorant bring faith"]; //quotes here
+
+	$("#marquee_top").html(marquee_data[randomizer(0,marquee_data.length)]);
+	$("#marquee_bottom").html(marquee_data[randomizer(0,marquee_data.length)]);
+}
+
+function randomizer (min, max) {	
+	return Math.floor(Math.random() * (max-min+1)) + min;
+};
+
+update=setInterval(function(){display_state();},1000);
+//update_clock=setInterval(function(){display_clock();},1000);
+update_marquee=setInterval(function(){display_marquees();},300*1000);
+
+
+</script>
+</body>
+</html>
+
+ 
