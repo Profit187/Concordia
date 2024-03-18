@@ -283,7 +283,7 @@ function list_tracked(data) {
 				$(`#identity_for_object_${i}`).append("<span>Unidentified </span>");
 			}
 			if (data.space_objects[i].class_known){
-				$(`#identity_for_object_${i}`).append(`<span> ${data.space_objects[i].classification} Class </span>"`);
+				$(`#identity_for_object_${i}`).append(`<span> ${data.space_objects[i].classification} Class </span>`);
 			}
 			else {
 				$(`#identity_for_object_${i}`).append("<span> </span>");
@@ -302,7 +302,7 @@ function list_tracked(data) {
 				$(`#track_for_object_${i}`).append("<span class='bearing'>Bearing Unknown</span>");
 			}
 			if (data.space_objects[i].range_known){
-				$(`#track_for_object_${i}`).append(`<span class='range'>Range ${round_distance(compute_ois_distance(data.space_objects[0],data.space_objects[i]))}</span>"`);
+				$(`#track_for_object_${i}`).append(`<span class='range'>Range ${round_distance(compute_ois_distance(data.space_objects[0],data.space_objects[i]))}</span>`);
 			}
 			else {
 				$(`#track_for_object_${i}`).append("<span class='range'>Range Unknown</span>");

@@ -3,14 +3,14 @@ import { QuickDB } from "quick.db";
 
 const app = express();
 const db = new QuickDB();
-const db_status = new QuickDB();
+//const db_status = new QuickDB();
 
 app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
-  res.sendFile("root.html", { root: "views" });
+  res.sendFile("screen_selection.html", { root: "views" });
 });
 
 app.get('/ois_control/:parameter', (req, res) => {
@@ -43,24 +43,24 @@ app.get('/local_screensaver', (req, res) => {
 
 //recieves the ship state and saves it to the database
 app.post("/state/:parameter", (req, res) => {
-  db.set(req.params.parameter, req.body);
+  db.set(`state_${req.params.parameter}`, req.body);
   res.sendStatus(200);
 });
 
 //upon request, retrieves the ship state in the database and returns it
 app.get('/state/:parameter', async (req, res) => {
-  res.send(await db.get(req.params.parameter));
+  res.send(await db.get(`state_${req.params.parameter}`));
 });
 
 //recieves the ship status and saves it to the database
 app.post("/status/:parameter", (req, res) => {
-  db_status.set(req.params.parameter, req.body);
+  db.set(`status_${req.params.parameter}`, req.body);
   res.sendStatus(200);
 });
 
 //upon request, retrieves the ship status in the database and returns it
 app.get('/status/:parameter', async (req, res) => {
-  res.send(await db_status.get(req.params.parameter));
+  res.send(await db.get(`status_${req.params.parameter}`));
 });
 
 app.listen(3000, () => {
