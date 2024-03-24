@@ -63,7 +63,7 @@ var ship_systems = {
     place: "right", 
     name: "Primary Overflow Control", 
     desc: "Reactor overflow ventilation system", 
-    buttons: [{label: "Main Valves Open", status: "Main Valves Open"}, {label: "Main Valves Closed: Emergency Valves Open", status: "<span style=\"font-size: 25px\">Main Valves Closed: Emergency Valves Open</span>"}, {label: "Emergency Valve 80%", status: "<span style=\"font-size: 25px\">Main Valves Closed: Emergency Valves 80%</span>"}, {label: "Emergency Valve 60%", status: "<span style=\"font-size: 25px\">Main Valves Closed: Emergency Valves 60%</span>"}, {label: "Emergency Valve 40%", status: "<span style=\"font-size: 25px\">Main Valves Closed: Emergency Valves 40%</span>"}, {label: "Malfunction", status: "<span class=\"blink\" style=\"color:red\">Malfunction</span>"}]}),
+    buttons: [{label: "Main Valves Open", status: "Main Valves Open"}, {label: "Emergency Valves Only", status: "Emergency Valves Only"}, {label: "Emergency Valve 80%", status: "Emergency Valves Only (80%)"}, {label: "Emergency Valve 60%", status: "Emergency Valves Only (60%)"}, {label: "Emergency Valve 40%", status: "Emergency Valves Only (40%)"}, {label: "Malfunction", status: "<span class=\"blink\" style=\"color:red\">Malfunction</span>"}]}),
 ],
   //Escort setup
   escort: [new system({ 

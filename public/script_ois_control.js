@@ -477,71 +477,62 @@ function toggle_button_visibility(id) {
   update_log_state_all_ois();
 }
 
-//turn into method?
 function change_target_speed(id, amount){
   space_objects[id].target_speed += parseInt(amount);
 }
-//turn into method?
 function change_target_heading(id, amount){
   space_objects[id].target_heading = adjust_bearing(space_objects[id].target_heading + parseInt(amount));
 }
 
-//turn into method?
 function halt_turn_and_acc(id){
-  space_objects[id].target_heading = space_objects[id].current_heading;
-  space_objects[id].target_speed = space_objects[id].current_speed;
+  space_objects[id].target_heading = Math.round(space_objects[id].current_heading * 1e1)/1e1;
+  space_objects[id].target_speed = Math.round(space_objects[id].current_speed * 1e1)/1e1;
 }
 
-//turn into method?
 function toggle_range_rings(id){
   if (space_objects[id].range_rings_visible) space_objects[id].range_rings_visible = false;
   else space_objects[id].range_rings_visible = true;
 }
 
-//turn into method?
 function sap_speed(id){
   space_objects[id].current_speed -= 5;
 }
 
-//turn into method?
 function set_flexible_range_ring_range_from_databox(id){
   space_objects[id].flexible_range_ring_range = document.getElementById("databox").value;
 }
 
-//turn into method?
 function toggle_boosters_firing(id){
   if (space_objects[id].boosters_firing) space_objects[id].boosters_firing = false;
   else space_objects[id].boosters_firing = true;
 }
 
-//turn into method?
 function toggle_movement_history_visible(id){
   if (space_objects[id].movement_history_visible) space_objects[id].movement_history_visible = false;
   else space_objects[id].movement_history_visible = true;
 }
 
-//turn into method?
 function toggle_thrusters_firing(id){
   if (space_objects[id].thrusters_firing) space_objects[id].thrusters_firing = false;
   else space_objects[id].thrusters_firing = true;
 }
 
-//turn into method?
 function toggle_firing_arcs_visible(id){
   if (space_objects[id].firing_arcs_visible) space_objects[id].firing_arcs_visible = false;
   else space_objects[id].firing_arcs_visible = true;
   update_log_state_all_ois();
 }
 
-//turn into method?
 function set_target_speed_from_databox(id){
-  space_objects[id].target_speed = document.getElementById("databox").value;
+  space_objects[id].target_speed = parseInt(document.getElementById("databox").value);
   update_log_state_all_ois();
 }
 
-//turn into method?
 function set_target_heading_from_databox(id){
-  space_objects[id].target_heading = document.getElementById("databox").value;
+  space_objects[id].target_heading = parseInt(document.getElementById("databox").value);
+  while (space_objects[id].target_heading > 360) {
+    space_objects[id].target_heading -= 360;
+  }
 }
 
 //reads ois to form
