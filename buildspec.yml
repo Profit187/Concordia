@@ -5,6 +5,7 @@ phases:
       nodejs: 20
   pre_build:
     commands:
+      - rm -rf node_modules
       - npm install
   build:
     commands:
